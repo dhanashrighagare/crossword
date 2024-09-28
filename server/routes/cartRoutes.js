@@ -27,6 +27,7 @@ router.delete("/remove", async (req, res) => {
     console.log(productIndex)
 
     if (productIndex === -1) {
+      console.log("Product not found in cart")
       return res.status(404).json({ message: "Product not found in cart" });
     }
 
@@ -34,7 +35,8 @@ router.delete("/remove", async (req, res) => {
 
     await existingCart.save();
 
-    res.status(200).json({ message: "Product removed from cart successfully" });
+    console.log("Product removed from cart successfully")
+    res.status(200).json({ message: "Product removed from cart successfully", carts: existingCart });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal server error" });

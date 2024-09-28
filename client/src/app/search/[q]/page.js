@@ -1,10 +1,9 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
-import { Box, Button, Card, CardBody, CardFooter, Container, Heading, Image, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, Container, Heading, Image, Stack } from "@chakra-ui/react";
 
-export default function page({params}) {
+export default function Page({ params }) {
   const [searchResults, setSearchResults] = useState();
   const query = params?.q;
 
@@ -30,14 +29,13 @@ export default function page({params}) {
   return (
     <Container p={0} maxW="100%" m={0}>
       <Box p={8}>
-        <Heading fontSize={24}>Search Results</Heading>
+        <Heading mb={6} fontSize={25} color="#444444" textAlign="center">Search Results</Heading>
 
         {searchResults?.map((result) => (
-            <Card
+          <Box
             key={result._id}
-            direction={{ base: "column", sm: "row" }}
-            overflow="hidden"
-            variant="outline"
+            mb={4}
+            textAlign="center" 
           >
             <Image
               objectFit="cover"
@@ -45,24 +43,13 @@ export default function page({params}) {
               src={result?.image}
               alt=""
             />
-  
-            <Stack>
-              <CardBody>
-                <Heading size="md">{result.name}</Heading>
-  
-                {/* <Text py="2">
-                  Caffè latte is a coffee beverage of Italian origin made with
-                  espresso and steamed milk.
-                </Text> */}
-              </CardBody>
-  
-              <CardFooter>
-                <Button variant="solid" colorScheme="blue">
-                 ADD TO BAG
-                </Button>
-              </CardFooter>
+            <Stack p={4} spacing={2}>
+              <Heading size="md">{result.name}</Heading>
+              <Button variant="solid" colorScheme="blue">
+                ADD TO BAG
+              </Button>
             </Stack>
-          </Card>
+          </Box>
         ))}
       </Box>
     </Container>

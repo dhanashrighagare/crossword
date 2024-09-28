@@ -23,6 +23,9 @@ const EditBookPage = () => {
     price: "",
     category: "",
   });
+
+  const [image, setImage] = useState(null);
+
   const [error, setError] = useState(null);
   const toast = useToast();
   const router = useRouter();
@@ -48,31 +51,65 @@ const EditBookPage = () => {
     fetchBook();
   }, [id]);
 
+  useEffect(() => {
+    if (image) {
+      const objectUrl = URL.createObjectURL(image);
+      console.log(objectUrl);
+
+      return () => URL.revokeObjectURL(objectUrl);
+    }
+  }, [image]);
+
+  const imageHandler = (e) => {
+    if (e.target.files.length > 0) {
+      setImage(e.target.files[0]);
+    }
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setBook({ ...book, [name]: value });
   };
 
-  const handleFileChange = (e) => {
-    setBook({ ...book, image: e.target.files[0] });
-  };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const formData = new FormData();
-    formData.append("name", book.name);
-    formData.append("price", book.price);
-    formData.append("category", book.category);
-    if (book.image) {
-      formData.append("image", book.image);
+  const handleSubmit = async (data) => {
+
+    let productData = {}
+    productData.name = data.get('name')
+    productData.price = data.get('price')
+    productData.category = data.get('category')
+    
+    console.log(image);
+
+    let formData = new FormData();
+    if (image) {
+      formData.append('book', image);
+    }
+
+    const uploadResponse = await fetch('http://localhost:8000/upload', {
+      method: 'POST',
+      body: formData,
+    });
+
+    // if (!uploadResponse.ok) {
+    //   const errorText = await uploadResponse.text();
+    //   throw new Error(`Upload failed: ${errorText}`);
+    // }
+
+    const uploadData = await uploadResponse.json();
+
+    if(!uploadData) {
+      return;
     }
 
     try {
-      const response = await axios.put(`/books/update-book/${id}`, formData, {
+      const response = await axios.put(`http://localhost:8000/api/books/update-book/${id}`, {...productData, image: uploadData.image_url }, {
         headers: {
           "Content-Type": "multipart/form-data",
+          "Content-Type": "application/json"
         },
       });
+
       if (response.data.success) {
         toast({
           title: "Success",
@@ -81,7 +118,7 @@ const EditBookPage = () => {
           duration: 5000,
           isClosable: true,
         });
-        router.push("/booklist");
+        router.push("/admin/listbook");
       } else {
         toast({
           title: "Error",
@@ -123,7 +160,7 @@ const EditBookPage = () => {
           </Box>
         )}
         <Box  p={4}>
-          <form onSubmit={handleSubmit}>
+          <form method="POST" action={handleSubmit} encType="multipart/formdata">
             <VStack spacing={4} align="stretch">
               <FormControl id="image">
                 <FormLabel color="gray.600">Upload New Image</FormLabel>
@@ -131,7 +168,7 @@ const EditBookPage = () => {
                   type="file"
                   name="image"
                   accept="image/*"
-                  onChange={handleFileChange}
+                  onChange={imageHandler}
                   bg="white"
                   borderColor="gray.300"
                   _hover={{ borderColor: "gray.500" }}

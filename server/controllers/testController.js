@@ -1,5 +1,5 @@
 const testController = (req, res) => {
-  res.send('Test route is working!');
+  return res.send('Test route is working!');
 };
 
 module.exports = {

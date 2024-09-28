@@ -35,16 +35,28 @@ const ListBook = () => {
   }, []);
 
   // Remove a book by ID
-  const removeBook = async (id) => {
+  const removeBook = async (productId) => {
+    const r = confirm("Do you want to delete this product? ");
+    if(!r) {
+      return;
+    }
     try {
-      await fetch("http://localhost:8000/books/removebook", {
-        method: "POST",
+        const api = await fetch("http://localhost:8000/api/books/removebook", {
+            method: "DELETE",
+            body: JSON.stringify({
+              productId,
+            }),
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ id }),
+        }
       });
+      const resp = await api.json();
+      if(resp?.success) {
+        alert(`${resp?.name} is deleted`);
+      } else {
+        alert(`${resp?.name} is not deleted`);
+      }
       fetchInfo();
     } catch (error) {
       console.error("Error removing book:", error);
@@ -68,7 +80,7 @@ const ListBook = () => {
             <Text>Actions</Text>
           </SimpleGrid>
           <Divider mb={4} />
-          <Box maxHeight="400px" overflowY="auto">
+          <Box maxHeight="490px" overflowY="auto">
             {allbooks.length > 0 ? (
               allbooks.map((book) => (
                 <Box
@@ -101,6 +113,7 @@ const ListBook = () => {
                       />
                     </NextLink>
                     <IconButton
+                      onClick = {() => removeBook(book._id)}
                       aria-label="Delete"
                       icon={<DeleteIcon />}
                       colorScheme="red"

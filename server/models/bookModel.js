@@ -33,6 +33,11 @@ const bookSchema = new mongoose.Schema({
   description: {
     type: String,
   }
+}, {
+  timestamps: {
+    createdAt: true,
+    updatedAt: true
+  }
 });
 
 const Book = mongoose.model('Book', bookSchema);

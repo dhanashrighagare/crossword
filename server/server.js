@@ -38,6 +38,8 @@ const storage = multer.diskStorage({
   app.use('/images', express.static(path.join(__dirname, 'upload/images')));
 
   app.post("/upload", upload.single('book'), (req, res) => {
+
+    console.log({req});
       
     if (req.file) {
       const imageUrl = `http://localhost:${PORT}/images/${req.file.filename}`;

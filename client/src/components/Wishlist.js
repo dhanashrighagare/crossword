@@ -2,30 +2,15 @@
 
 import { Box, Flex, Button, Heading, Image, SimpleGrid, Stack, Text } from '@chakra-ui/react';
 import { useSession } from 'next-auth/react';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { DeleteIcon } from '@chakra-ui/icons'
 import useWishlist from "@/providers/WishlistState";
+import useCart from "@/providers/CartState";
 
-export default function Wishlist() {
+export default function Wishlist( ) {
   const { wishlist, removeProductInWishlist } = useWishlist();
   const { data } = useSession();
-
-  // useEffect(() => {
-  //   fetch("http://localhost:8000/api/users/mywishlist", {
-  //     method: "POST",
-  //     body: JSON.stringify({
-  //       userId: data?.user?.userId,
-  //     }),
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //   })
-  //     .then((response) => response.json())
-  //     .then((data) => {
-  //       setWishlist(data.wishlists);
-  //     })
-  //     .catch((error) => console.error(error));
-  // }, [data]);
+  const { cart, addProduct } = useCart();
 
   const removeFromWishlist = (productId) => {
     removeProductInWishlist(productId);
@@ -49,8 +34,12 @@ export default function Wishlist() {
       .catch((error) => console.error(error));
   };
 
+  // const handleAddToBag = async () => {
+  //   addProduct({ _id: id, image, quantity: 1, name, author, price, discount });
+  // }
+
   return (
-    <Box p={20}>
+    <Box p={20} overflowY="scroll" maxH="630px" >
       <Heading mb={6} fontSize={25} color="#444444" textAlign="center">
         My Wishlist
       </Heading>
@@ -86,7 +75,7 @@ export default function Wishlist() {
                     e.currentTarget.style.color = '#000000';
                   }}
                 >
-                  BUY NOW
+                  ADD TO BAG
                 </Button>
                 <DeleteIcon 
                   ml={3}

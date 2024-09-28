@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   Box,
   Image,
@@ -20,7 +20,7 @@ const Item = ({ id, image, name, author, price, discount }) => {
   const { data } = useSession();
   const toast = useToast();
 
-  const { cart, addProduct, addInitialCartData } = useCart();
+  const { cart, addProduct } = useCart();
   const { wishlist, addProductInWishlist, removeProductInWishlist } = useWishlist();
 
   const discountedPrice = Math.abs(price * (discount / 100) - price);
@@ -53,6 +53,7 @@ const Item = ({ id, image, name, author, price, discount }) => {
       })  
       .catch((error) => console.error(error));
   };
+
   const removeFromWishlist = async (productId) => {
     removeProductInWishlist(productId);
   };
@@ -132,15 +133,7 @@ const Item = ({ id, image, name, author, price, discount }) => {
             ADD TO BAG
           </Button>
         )}
-        <Button
-          variant="ghost"
-          onClick={handleWishlist}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          border="1px solid transparent"
-        >
-           {wishlist?.find((item) => item.id === id) ? (
+        {wishlist?.find((item) => item.id === id) ? (
           <Button
             variant="solid"
             colorScheme="blue"
@@ -156,7 +149,6 @@ const Item = ({ id, image, name, author, price, discount }) => {
             <IoMdHeartEmpty />
           </Button>
         )}
-        </Button>
       </ButtonGroup>
     </Box>
   );

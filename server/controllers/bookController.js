@@ -94,7 +94,7 @@ const getAllBooks = async (req, res) => {
 const removeBookController = async (req, res) => {
   try {
     // Find and delete the book by its ID
-    const result = await Book.findOneAndDelete({ _id: req.body.id });
+    const result = await Book.findOneAndDelete({ _id: req.body.productId });
 
     if (!result) {
       return res.status(404).json({

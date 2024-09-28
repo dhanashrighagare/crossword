@@ -2,8 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { Box, Input, Select, Button, Image, Stack, FormLabel, FormControl, Container, useToast } from '@chakra-ui/react';
-import Header from '@/app/admin/header/page';
-import HeaderSection from '@/app/admin/headersection/page';
 import Sidebar from '../sidebar/page';
 
 const AddBook = () => {

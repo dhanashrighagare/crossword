@@ -37,6 +37,8 @@ const addToCartController = async (req, res) => {
   const myWishlistController =  async (req, res) => {
 
     const { userId } = req.body;
+
+    console.log({userId})
   
     const wishlists = await Wishlist.find({ userId }).populate("products.product");
 
@@ -62,7 +64,7 @@ const addToCartController = async (req, res) => {
 
   const addProductWishlist = async (req, res) => {
     try {
-      const { userId, productId, quantity=1 } = req.body;
+      const { userId, productId } = req.body;
 
       console.log("Wishlist controller")
   
@@ -80,17 +82,17 @@ const addToCartController = async (req, res) => {
       );
   
       if (productIndex !== -1) {
-        existingWishlist.products[productIndex].quantity += quantity;
+        console.log("product already exist")
+        return res.json({message: "product already exist", exist: true}).status(200);
       }    
       else {
-        existingWishlist.products.push({ product: productId, quantity });
+        existingWishlist.products.push({ product: productId });
       }
   
       await existingWishlist.save();
-      return res.status(200).json({ message: "Product added to wishlist successfully", wishlist: existingWishlist });
+      return res.status(200).json({ message: "Product added to wishlist successfully", wishlist: existingWishlist, exist: true });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ error: "Internal server error" });
       return res.status(500).json({ error: "Internal server error" });
     }
 
@@ -99,27 +101,28 @@ const addToCartController = async (req, res) => {
   const removeProductWishlist = async (req, res) => {
     const { userId, productId } = req.body;
   
-    if (!userId || !productId) {
-      return res.status(400).json({ message: "User ID and Product ID are required." });
-    }
-  
     try {
-      const wishlist = await Wishlist.findOneAndUpdate(
-        { userId: userId },
-        { $pull: { products: { product: productId } } }, 
-        { new: true } 
-      );
+      const wishlist = await Wishlist.findOne({ userId });
   
       if (!wishlist) {
-        return res.status(404).json({ message: "Wishlist not found." });
+        return res.status(404).json({ error: 'Wishlist not found' });
       }
-  
-      return res.status(200).json({ message: "Product removed from wishlist.", wishlists: wishlist });
-    } catch (error) {
-      console.error("Error removing product from wishlist:", error);
-      return res.status(500).json({ message: "Internal server error." });
-    }
-  };
+
+      const productIndex = wishlist.products.findIndex(
+        (item) => item.product.toString() === productId
+      );
+      if (productIndex !== -1) {
+          wishlist.products.splice(productIndex, 1);
+          await wishlist.save();
+          return res.status(200).json({ message: 'Product removed from wishlist', wishlist, success: true });
+      } else {
+          return res.status(404).json({ error: 'Product not found in wishlist', success: false });
+      }
+  } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: 'Internal server error' });
+  }
+  }
 
   const getAllCartsController = async (req, res) => {
     const { userId } = req.body;
@@ -148,7 +151,6 @@ module.exports = {
     addToCartController,
     myWishlistController,
     getAllCartsController,
-    addProductWishlist,
     addProductWishlist,
     removeProductWishlist
 };
